@@ -1,0 +1,17 @@
+# Friendly Meals Flutter
+
+Friendly Meals Flutter ist eine responsive, auf Android ausgerichtete Flutter-App mit vollständig deutschsprachigen Nutzerinhalten und einer von Radiant inspirierten visuellen Gestaltung.
+
+Im Mittelpunkt der App steht das Erstellen und Verwalten von Rezepten. Rezepte lassen sich aus Zutaten und zusätzlichen Notizen generieren und lokal speichern. Die Zutaten können nicht nur manuell eingegeben, sondern auch über eine Kameraaufnahme in das Eingabefeld übernommen werden. Anschließend können Rezepte durchsucht, gefiltert, sortiert, favorisiert und bewertet werden. Detailseiten für einzelne Rezepte werden über typisierte GoRouter-Pfade geöffnet, und die jeweiligen Zutaten können direkt zur Einkaufsliste hinzugefügt werden.
+
+Ergänzt wird dieser Kern durch weitere alltagsnahe Funktionen. Die Einkaufsliste erlaubt das Hinzufügen, Abhaken und Löschen einzelner Einträge. Zusätzlich kann eine Mahlzeit gescannt werden, um Nährwertinformationen anzuzeigen. Auch ein Zutaten-zu-Geschäft-Finder ist integriert. Für das Kochen selbst steht ein Live-Assistent zur Verfügung, der die rückseitige Kamera des Geräts nutzt. Rezepte, Einkaufslisten und Filtereinstellungen werden lokal mit SharedPreferences gespeichert. Die Benutzeroberfläche ist responsiv umgesetzt und passt sich an Smartphones, Foldables, Tablets und Desktop-Breiten an.
+
+Technisch basiert das Projekt auf Flutter und Material 3. Für Zustandsverwaltung und Dependency Management kommt Riverpod zum Einsatz, während GoRouter die Navigation übernimmt. SharedPreferences dient der lokalen Persistenz, und Kamera- sowie Image-Picker-Funktionen decken die visuellen Features ab. Ergänzt wird das Ganze durch zentral verwaltete, von Radiant inspirierte Design-Tokens.
+
+Die Projektstruktur ist bewusst klar getrennt. Im Verzeichnis `lib/` liegen `main.dart` und unter `src/` die zentralen Bereiche der Anwendung. Dazu gehören `app.dart`, der Kernbereich mit Routing, Theme und wiederverwendbaren Widgets sowie die Feature-Module für Einkaufsliste, Live-Assistent, Mahlzeiten-Scan und Rezepte. Innerhalb des Rezeptbereichs ist die Logik zusätzlich in `application`, `data`, `domain` und `presentation` gegliedert. Dadurch bleiben Screens, wiederverwendbare Komponenten, unveränderliche Domain-Modelle, Anwendungszustand, Persistenz und Geschäftslogik sauber voneinander getrennt. Code-Generierung ist für dieses Projekt nicht erforderlich.
+
+Die wichtigsten Routen der App sind `/generate`, `/recipes`, `/recipes/filter`, `/recipes/:recipeId`, `/recipes/:recipeId/live`, `/scan-meal` und `/grocery-list`. Für den Einstieg wird das aktuelle stabile Flutter-SDK zusammen mit Java 17 benötigt. Danach können mit `flutter pub get`, `dart run flutter_launcher_icons` und `flutter run` alle notwendigen Schritte zum Start der App ausgeführt werden. Die Android Application ID lautet `com.jonas.ermert.friendly_meals`, und als Host-Sprache auf Android wird Java verwendet.
+
+Für die Qualitätssicherung stehen die üblichen Prüfkommandos bereit: `dart format --output=none --set-exit-if-changed lib test`, `flutter analyze`, `flutter test` und `flutter build apk --debug`. Die App arbeitet mit deterministischem lokalem Verhalten und geräteinterner Speicherung, sodass keine Projektzugangsdaten erforderlich sind. Die vorhandenen Service- und Repository-Grenzen sind dabei bereits so angelegt, dass sie später bei Bedarf durch echte Firebase-Implementierungen ersetzt werden können.
+
+Das Projekt steht unter der MIT-Lizenz; weitere Informationen finden sich in der Datei `LICENSE`.
