@@ -1,6 +1,21 @@
 * text=auto eol=lf
+
+*.dart text diff=dart
+*.yaml text eol=lf
+*.yml text eol=lf
+*.arb text eol=lf
+*.json text eol=lf
+*.gradle text eol=lf
+*.kts text eol=lf
+*.kt text eol=lf
+*.swift text eol=lf
+*.plist text eol=lf
+*.pbxproj text eol=lf
+
 *.png binary
 *.jpg binary
 *.jpeg binary
 *.gif binary
 *.jar binary
+*.jks binary
+*.keystore binary
