@@ -13,28 +13,42 @@ class FriendlyMealsRepository {
 
   Future<FriendlyMealsState> load() async {
     final preferences = await SharedPreferences.getInstance();
-    try {
-      final recipes = _decodeList(preferences.getString(_recipesKey))
+    final recipes = _readOrDefault(
+      () => _decodeList(preferences.getString(_recipesKey))
           .map(Recipe.fromJson)
-          .toList();
-      final groceries = _decodeList(preferences.getString(_groceriesKey))
+          .toList(),
+      <Recipe>[],
+    );
+    final groceries = _readOrDefault(
+      () => _decodeList(preferences.getString(_groceriesKey))
           .map(GroceryItem.fromJson)
-          .toList();
+          .toList(),
+      <GroceryItem>[],
+    );
+    final filters = _readOrDefault(() {
       final filtersValue = preferences.getString(_filtersKey);
-      final filters = filtersValue == null
+      return filtersValue == null
           ? const RecipeFilters()
           : RecipeFilters.fromJson(
               (jsonDecode(filtersValue) as Map<Object?, Object?>).map(
                 (key, value) => MapEntry(key.toString(), value),
               ),
             );
-      return FriendlyMealsState(
-        recipes: recipes,
-        groceries: groceries,
-        filters: filters,
-      );
+    }, const RecipeFilters());
+    return FriendlyMealsState(
+      recipes: recipes,
+      groceries: groceries,
+      filters: filters,
+    );
+  }
+
+  T _readOrDefault<T>(T Function() read, T fallback) {
+    try {
+      return read();
     } on FormatException {
-      return const FriendlyMealsState();
+      return fallback;
+    } on TypeError {
+      return fallback;
     }
   }
 
