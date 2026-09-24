@@ -54,14 +54,19 @@ class FriendlyMealsController extends AsyncNotifier<FriendlyMealsState> {
   Future<void> resetFilters() => setFilters(const RecipeFilters());
 
   Future<void> addGrocery(String name) async {
+    final normalized = name.trim();
+    if (normalized.isEmpty) return;
     final current = state.value ?? const FriendlyMealsState();
+    if (current.groceries.any(
+      (item) => item.name.trim().toLowerCase() == normalized.toLowerCase(),
+    )) return;
     await _commit(
       current.copyWith(
         groceries: [
           ...current.groceries,
           GroceryItem(
             id: DateTime.now().microsecondsSinceEpoch.toString(),
-            name: name,
+            name: normalized,
           ),
         ],
       ),
@@ -71,11 +76,13 @@ class FriendlyMealsController extends AsyncNotifier<FriendlyMealsState> {
   Future<void> addIngredients(List<String> names) async {
     final current = state.value ?? const FriendlyMealsState();
     final existing = current.groceries
-        .map((item) => item.name.toLowerCase())
+        .map((item) => item.name.trim().toLowerCase())
         .toSet();
     final additions = names
-        .where((name) => !existing.contains(name.toLowerCase()))
+        .map((name) => name.trim())
+        .where((name) => name.isNotEmpty && existing.add(name.toLowerCase()))
         .toList();
+    if (additions.isEmpty) return;
     final timestamp = DateTime.now().microsecondsSinceEpoch;
     await _commit(
       current.copyWith(

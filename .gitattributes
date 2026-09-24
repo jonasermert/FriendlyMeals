@@ -1,6 +1,10 @@
 * text=auto eol=lf
 
 *.dart text diff=dart
+*.dart linguist-language=Dart
+android/build/** linguist-generated
+**/build/** linguist-generated
+**/reports/** linguist-generated
 *.yaml text eol=lf
 *.yml text eol=lf
 *.arb text eol=lf

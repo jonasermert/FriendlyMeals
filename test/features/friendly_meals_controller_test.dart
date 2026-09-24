@@ -29,9 +29,14 @@ void main() {
     await controller.saveRecipe(recipe);
     await controller.addIngredients(recipe.ingredients);
     await controller.addIngredients(['tomaten']);
+    await controller.addIngredients([' TOMATEN ', 'Paprika', ' paprika ', '']);
+    await controller.addGrocery('  ');
+    await controller.addGrocery(' paprika ');
 
     final state = container.read(friendlyMealsControllerProvider).requireValue;
     expect(state.recipes.single, recipe);
-    expect(state.groceries, hasLength(2));
+    expect(state.groceries.map((item) => item.name), [
+      'Tomaten', 'Knoblauch', 'Paprika',
+    ]);
   });
 }
