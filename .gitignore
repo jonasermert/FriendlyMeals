@@ -18,3 +18,5 @@ android/app/release/
 key.properties
 local.properties
 .env
+/android/build/
+**/build/
