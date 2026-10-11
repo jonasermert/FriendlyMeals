@@ -4,8 +4,8 @@ import 'package:friendly_meals/src/core/theme/app_spacing.dart';
 import 'package:friendly_meals/src/core/widgets/empty_state.dart';
 import 'package:friendly_meals/src/core/widgets/page_heading.dart';
 import 'package:friendly_meals/src/features/recipes/application/friendly_meals_controller.dart';
+import 'package:friendly_meals/src/features/recipes/presentation/recipe_filter_sheet.dart';
 import 'package:friendly_meals/src/features/recipes/presentation/widgets/recipe_card.dart';
-import 'package:go_router/go_router.dart';
 
 class RecipeListScreen extends ConsumerWidget {
   const RecipeListScreen({super.key});
@@ -36,7 +36,7 @@ class RecipeListScreen extends ConsumerWidget {
                   eyebrow: 'Deine Sammlung',
                   title: 'Alle Rezepte',
                   action: OutlinedButton.icon(
-                    onPressed: () => context.go('/recipes/filter'),
+                    onPressed: () => showRecipeFilterSheet(context),
                     icon: const Icon(Icons.tune),
                     label: const Text('Filter'),
                   ),
@@ -65,7 +65,11 @@ class RecipeListScreen extends ConsumerWidget {
                 sliver: SliverLayoutBuilder(
                   builder: (context, constraints) {
                     final width = constraints.crossAxisExtent;
-                    final columns = width >= 1000 ? 3 : width >= 620 ? 2 : 1;
+                    final columns = width >= 1000
+                        ? 3
+                        : width >= 620
+                        ? 2
+                        : 1;
                     return SliverGrid.builder(
                       itemCount: recipes.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
