@@ -9,17 +9,10 @@ class GroceryItem {
   final String name;
   final bool checked;
 
-  GroceryItem copyWith({bool? checked}) => GroceryItem(
-    id: id,
-    name: name,
-    checked: checked ?? this.checked,
-  );
+  GroceryItem copyWith({bool? checked}) =>
+      GroceryItem(id: id, name: name, checked: checked ?? this.checked);
 
-  Map<String, Object?> toJson() => {
-    'id': id,
-    'name': name,
-    'checked': checked,
-  };
+  Map<String, Object?> toJson() => {'id': id, 'name': name, 'checked': checked};
 
   factory GroceryItem.fromJson(Map<String, Object?> json) => GroceryItem(
     id: json['id'] as String? ?? '',

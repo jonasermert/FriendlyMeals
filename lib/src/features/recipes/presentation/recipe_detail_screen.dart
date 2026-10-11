@@ -169,11 +169,7 @@ class _RecipeHero extends ConsumerWidget {
       child: Stack(
         children: [
           const Center(
-            child: Icon(
-              Icons.auto_awesome,
-              color: AppColors.teal,
-              size: 74,
-            ),
+            child: Icon(Icons.auto_awesome, color: AppColors.teal, size: 74),
           ),
           Positioned(
             left: AppSpacing.lg,
@@ -191,9 +187,7 @@ class _RecipeHero extends ConsumerWidget {
               tooltip: 'Favorit',
               onPressed: () => ref
                   .read(friendlyMealsControllerProvider.notifier)
-                  .updateRecipe(
-                    recipe.copyWith(favorite: !recipe.favorite),
-                  ),
+                  .updateRecipe(recipe.copyWith(favorite: !recipe.favorite)),
               icon: Icon(
                 recipe.favorite ? Icons.favorite : Icons.favorite_border,
               ),
@@ -227,7 +221,10 @@ class _InfoCard extends StatelessWidget {
       children: [
         Icon(icon, color: AppColors.teal),
         const SizedBox(height: AppSpacing.sm),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.muted)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 11, color: AppColors.muted),
+        ),
         const SizedBox(height: AppSpacing.xs),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
       ],

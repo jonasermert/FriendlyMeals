@@ -33,8 +33,9 @@ class _GenerateRecipeScreenState extends ConsumerState<GenerateRecipeScreen> {
     final image = await ImagePicker().pickImage(source: ImageSource.camera);
     if (image == null || !mounted) return;
     setState(() => _loading = true);
-    final ingredients =
-        await ref.read(recipeServiceProvider).detectIngredients();
+    final ingredients = await ref
+        .read(recipeServiceProvider)
+        .detectIngredients();
     if (!mounted) return;
     _ingredientsController.text = ingredients;
     setState(() => _loading = false);
@@ -43,13 +44,10 @@ class _GenerateRecipeScreenState extends ConsumerState<GenerateRecipeScreen> {
   Future<void> _generate() async {
     if (_ingredientsController.text.trim().isEmpty) return;
     setState(() => _loading = true);
-    final recipe = await ref.read(recipeServiceProvider).generate(
-      _ingredientsController.text,
-      _notesController.text,
-    );
-    await ref
-        .read(friendlyMealsControllerProvider.notifier)
-        .saveRecipe(recipe);
+    final recipe = await ref
+        .read(recipeServiceProvider)
+        .generate(_ingredientsController.text, _notesController.text);
+    await ref.read(friendlyMealsControllerProvider.notifier).saveRecipe(recipe);
     if (!mounted) return;
     context.go('/recipes/${recipe.id}');
   }
@@ -94,7 +92,10 @@ class _GenerateRecipeScreenState extends ConsumerState<GenerateRecipeScreen> {
                         ],
                       ),
                     )
-                  else ...[form, camera],
+                  else ...[
+                    form,
+                    camera,
+                  ],
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     color: const Color(0xFFF9FAFB),

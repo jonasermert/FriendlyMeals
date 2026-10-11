@@ -11,11 +11,13 @@ import 'package:friendly_meals/src/features/recipes/domain/recipe_filters.dart';
 import 'package:go_router/go_router.dart';
 
 class RecipeFilterScreen extends ConsumerStatefulWidget {
-  const RecipeFilterScreen({super.key});
+  const RecipeFilterScreen({super.key, this.scrollController, this.onClose});
+
+  final ScrollController? scrollController;
+  final VoidCallback? onClose;
 
   @override
-  ConsumerState<RecipeFilterScreen> createState() =>
-      _RecipeFilterScreenState();
+  ConsumerState<RecipeFilterScreen> createState() => _RecipeFilterScreenState();
 }
 
 class _RecipeFilterScreenState extends ConsumerState<RecipeFilterScreen> {
@@ -38,18 +40,49 @@ class _RecipeFilterScreenState extends ConsumerState<RecipeFilterScreen> {
     super.dispose();
   }
 
+  bool _saving = false;
+
+  void _close() {
+    if (widget.onClose != null) {
+      widget.onClose!();
+    } else {
+      context.go('/recipes');
+    }
+  }
+
+  Future<void> _save(RecipeFilters filters) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await ref
+          .read(friendlyMealsControllerProvider.notifier)
+          .setFilters(filters);
+      if (mounted) _close();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Filter konnten nicht gespeichert werden. Bitte erneut versuchen.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   Future<void> _apply() async {
     final next = _filters.copyWith(
       search: _searchController.text,
       title: _titleController.text,
     );
-    await ref.read(friendlyMealsControllerProvider.notifier).setFilters(next);
-    if (mounted) context.go('/recipes');
+    await _save(next);
   }
 
   Future<void> _reset() async {
-    await ref.read(friendlyMealsControllerProvider.notifier).resetFilters();
-    if (mounted) context.go('/recipes');
+    await _save(const RecipeFilters());
   }
 
   @override
@@ -70,133 +103,166 @@ class _RecipeFilterScreenState extends ConsumerState<RecipeFilterScreen> {
       for (final recipe in data.recipes) ...recipe.tags,
     }.toList();
 
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+    return Column(
       children: [
-        PageHeading(
-          eyebrow: 'Rezeptsammlung',
-          title: 'Rezepte filtern',
-          action: IconButton.outlined(
-            tooltip: 'Zurück',
-            onPressed: () => context.go('/recipes'),
-            icon: const Icon(Icons.arrow_back),
+        Expanded(
+          child: ListView(
+            controller: widget.scrollController,
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            children: [
+              PageHeading(
+                eyebrow: 'Rezeptsammlung',
+                title: 'Rezepte filtern',
+                action: IconButton.outlined(
+                  tooltip: 'Zurück',
+                  onPressed: _saving ? null : _close,
+                  icon: const Icon(Icons.arrow_back),
+                ),
+              ),
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 760),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
+                      border: Border.all(color: const Color(0x0D000000)),
+                      boxShadow: AppShadows.card,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _LabelledField(
+                          label: 'Suche',
+                          controller: _searchController,
+                          hint: 'Rezepte durchsuchen …',
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        _LabelledField(
+                          label: 'Rezepttitel',
+                          controller: _titleController,
+                          hint: 'z. B. Arrabbiata-Sauce',
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        Material(
+                          type: MaterialType.transparency,
+                          child: SwitchListTile.adaptive(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                            ),
+                            tileColor: const Color(0xFFF9FAFB),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.md),
+                            ),
+                            title: const Text(
+                              'Nur meine Rezepte',
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                            value: _filters.mine,
+                            onChanged: (value) => setState(
+                              () => _filters = _filters.copyWith(mine: value),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        const _Label('Bewertung'),
+                        RatingPicker(
+                          compact: true,
+                          value: _filters.rating,
+                          onChanged: (value) => setState(
+                            () => _filters = _filters.copyWith(rating: value),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        const _Label('Tags'),
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
+                          children: [
+                            for (final tag in tags)
+                              FilterChip(
+                                label: Text(tag),
+                                selected: _filters.tags.contains(tag),
+                                onSelected: (selected) {
+                                  final selectedTags = [..._filters.tags];
+                                  if (selected) {
+                                    selectedTags.add(tag);
+                                  } else {
+                                    selectedTags.remove(tag);
+                                  }
+                                  setState(
+                                    () => _filters = _filters.copyWith(
+                                      tags: selectedTags,
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        const _Label('Sortieren nach'),
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
+                          children: [
+                            for (final sort in RecipeSort.values)
+                              ChoiceChip(
+                                label: Text(_sortLabel(sort)),
+                                selected: _filters.sort == sort,
+                                selectedColor: AppColors.ink,
+                                labelStyle: TextStyle(
+                                  color: _filters.sort == sort
+                                      ? Colors.white
+                                      : AppColors.ink,
+                                ),
+                                onSelected: (_) => setState(
+                                  () =>
+                                      _filters = _filters.copyWith(sort: sort),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
+        Container(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x00F7F7F5), AppColors.background],
+            ),
+          ),
+          child: SafeArea(
+            top: false,
             child: Container(
-              padding: const EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppRadius.xl),
-                border: Border.all(color: const Color(0x0D000000)),
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(28),
                 boxShadow: AppShadows.card,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  _LabelledField(
-                    label: 'Suche',
-                    controller: _searchController,
-                    hint: 'Rezepte durchsuchen …',
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  _LabelledField(
-                    label: 'Rezepttitel',
-                    controller: _titleController,
-                    hint: 'z. B. Arrabbiata-Sauce',
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  SwitchListTile.adaptive(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                    ),
-                    tileColor: const Color(0xFFF9FAFB),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                    title: const Text(
-                      'Nur meine Rezepte',
-                      style: TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                    value: _filters.mine,
-                    onChanged: (value) =>
-                        setState(() => _filters = _filters.copyWith(mine: value)),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  const _Label('Bewertung'),
-                  RatingPicker(
-                    compact: true,
-                    value: _filters.rating,
-                    onChanged: (value) => setState(
-                      () => _filters = _filters.copyWith(rating: value),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _saving ? null : _reset,
+                      child: const Text('Zurücksetzen'),
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xl),
-                  const _Label('Tags'),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: [
-                      for (final tag in tags)
-                        FilterChip(
-                          label: Text(tag),
-                          selected: _filters.tags.contains(tag),
-                          onSelected: (selected) {
-                            final selectedTags = [..._filters.tags];
-                            if (selected) {
-                              selectedTags.add(tag);
-                            } else {
-                              selectedTags.remove(tag);
-                            }
-                            setState(
-                              () => _filters =
-                                  _filters.copyWith(tags: selectedTags),
-                            );
-                          },
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  const _Label('Sortieren nach'),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: [
-                      for (final sort in RecipeSort.values)
-                        ChoiceChip(
-                          label: Text(_sortLabel(sort)),
-                          selected: _filters.sort == sort,
-                          selectedColor: AppColors.ink,
-                          labelStyle: TextStyle(
-                            color: _filters.sort == sort
-                                ? Colors.white
-                                : AppColors.ink,
-                          ),
-                          onSelected: (_) => setState(
-                            () => _filters = _filters.copyWith(sort: sort),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _reset,
-                          child: const Text('Zurücksetzen'),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: _apply,
-                          child: const Text('Filter anwenden'),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _saving ? null : _apply,
+                      child: const Text('Filter anwenden'),
+                    ),
                   ),
                 ],
               ),

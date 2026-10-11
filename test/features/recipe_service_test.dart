@@ -34,11 +34,7 @@ void main() {
 
     final result = service.filter(
       recipes,
-      const RecipeFilters(
-        title: 'Pasta',
-        rating: 4,
-        tags: ['Italienisch'],
-      ),
+      const RecipeFilters(title: 'Pasta', rating: 4, tags: ['Italienisch']),
     );
 
     expect(result, hasLength(1));

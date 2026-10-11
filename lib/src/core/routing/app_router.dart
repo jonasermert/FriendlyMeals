@@ -15,15 +15,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/recipes/:recipeId/live',
-        builder: (context, state) => LiveAssistantScreen(
-          recipeId: state.pathParameters['recipeId']!,
-        ),
+        builder: (context, state) =>
+            LiveAssistantScreen(recipeId: state.pathParameters['recipeId']!),
       ),
       ShellRoute(
-        builder: (context, state, child) => AppShell(
-          location: state.uri.path,
-          child: child,
-        ),
+        builder: (context, state, child) =>
+            AppShell(location: state.uri.path, child: child),
         routes: [
           GoRoute(
             path: '/generate',

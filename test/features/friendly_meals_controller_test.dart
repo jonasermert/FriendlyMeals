@@ -24,8 +24,7 @@ void main() {
       servings: '2',
     );
 
-    final controller =
-        container.read(friendlyMealsControllerProvider.notifier);
+    final controller = container.read(friendlyMealsControllerProvider.notifier);
     await controller.saveRecipe(recipe);
     await controller.addIngredients(recipe.ingredients);
     await controller.addIngredients(['tomaten']);
@@ -36,7 +35,9 @@ void main() {
     final state = container.read(friendlyMealsControllerProvider).requireValue;
     expect(state.recipes.single, recipe);
     expect(state.groceries.map((item) => item.name), [
-      'Tomaten', 'Knoblauch', 'Paprika',
+      'Tomaten',
+      'Knoblauch',
+      'Paprika',
     ]);
   });
 }
