@@ -13,7 +13,9 @@ class RecipeService {
     await Future<void>.delayed(const Duration(milliseconds: 650));
     final ingredients = _split(ingredientsText);
     final tags = _split(notes);
-    final firstIngredient = ingredients.isEmpty ? 'Frisches' : ingredients.first;
+    final firstIngredient = ingredients.isEmpty
+        ? 'Frisches'
+        : ingredients.first;
     final title = notes.trim().isEmpty
         ? '$firstIngredient Küchenrezept'
         : '${notes.split(RegExp(r'[,.-]')).first.trim()} $firstIngredient';
@@ -46,8 +48,7 @@ class RecipeService {
           (title.isEmpty || recipe.title.toLowerCase().contains(title)) &&
           (!filters.mine || recipe.mine) &&
           (filters.rating == 0 || recipe.rating >= filters.rating) &&
-          (filters.tags.isEmpty ||
-              filters.tags.every(recipe.tags.contains));
+          (filters.tags.isEmpty || filters.tags.every(recipe.tags.contains));
     }).toList();
     switch (filters.sort) {
       case RecipeSort.rating:

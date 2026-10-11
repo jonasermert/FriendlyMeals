@@ -14,8 +14,10 @@ final recipeServiceProvider = Provider<RecipeService>(
   (ref) => const RecipeService(),
 );
 
-final friendlyMealsControllerProvider = AsyncNotifierProvider<
-    FriendlyMealsController, FriendlyMealsState>(FriendlyMealsController.new);
+final friendlyMealsControllerProvider =
+    AsyncNotifierProvider<FriendlyMealsController, FriendlyMealsState>(
+      FriendlyMealsController.new,
+    );
 
 class FriendlyMealsController extends AsyncNotifier<FriendlyMealsState> {
   FriendlyMealsRepository get _repository =>
@@ -59,7 +61,9 @@ class FriendlyMealsController extends AsyncNotifier<FriendlyMealsState> {
     final current = state.value ?? const FriendlyMealsState();
     if (current.groceries.any(
       (item) => item.name.trim().toLowerCase() == normalized.toLowerCase(),
-    )) return;
+    )) {
+      return;
+    }
     await _commit(
       current.copyWith(
         groceries: [
@@ -89,10 +93,7 @@ class FriendlyMealsController extends AsyncNotifier<FriendlyMealsState> {
         groceries: [
           ...current.groceries,
           for (var index = 0; index < additions.length; index++)
-            GroceryItem(
-              id: '${timestamp}_$index',
-              name: additions[index],
-            ),
+            GroceryItem(id: '${timestamp}_$index', name: additions[index]),
         ],
       ),
     );
@@ -104,9 +105,8 @@ class FriendlyMealsController extends AsyncNotifier<FriendlyMealsState> {
       current.copyWith(
         groceries: current.groceries
             .map(
-              (item) => item.id == id
-                  ? item.copyWith(checked: !item.checked)
-                  : item,
+              (item) =>
+                  item.id == id ? item.copyWith(checked: !item.checked) : item,
             )
             .toList(),
       ),
@@ -117,9 +117,7 @@ class FriendlyMealsController extends AsyncNotifier<FriendlyMealsState> {
     final current = state.value ?? const FriendlyMealsState();
     await _commit(
       current.copyWith(
-        groceries: current.groceries
-            .where((item) => item.id != id)
-            .toList(),
+        groceries: current.groceries.where((item) => item.id != id).toList(),
       ),
     );
   }
