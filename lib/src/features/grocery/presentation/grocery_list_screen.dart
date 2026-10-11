@@ -79,9 +79,7 @@ class _GroceryListScreenState extends ConsumerState<GroceryListScreen> {
                 key: const Key('addGroceryButton'),
                 tooltip: 'Hinzufügen',
                 onPressed: _add,
-                style: IconButton.styleFrom(
-                  minimumSize: const Size(54, 54),
-                ),
+                style: IconButton.styleFrom(minimumSize: const Size(54, 54)),
                 icon: const Icon(Icons.add),
               ),
             ],
