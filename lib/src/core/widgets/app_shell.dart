@@ -6,11 +6,7 @@ import 'package:friendly_meals/src/core/widgets/radiant_background.dart';
 import 'package:go_router/go_router.dart';
 
 class AppShell extends StatelessWidget {
-  const AppShell({
-    required this.location,
-    required this.child,
-    super.key,
-  });
+  const AppShell({required this.location, required this.child, super.key});
 
   final String location;
   final Widget child;
@@ -54,14 +50,16 @@ class AppShell extends StatelessWidget {
                           context.go(destinations[index].path),
                       backgroundColor: Colors.white.withValues(alpha: 0.88),
                       indicatorColor: AppColors.ink,
-                      selectedIconTheme:
-                          const IconThemeData(color: Colors.white),
+                      selectedIconTheme: const IconThemeData(
+                        color: Colors.white,
+                      ),
                       selectedLabelTextStyle: const TextStyle(
                         color: AppColors.ink,
                         fontWeight: FontWeight.w700,
                       ),
-                      unselectedIconTheme:
-                          const IconThemeData(color: AppColors.muted),
+                      unselectedIconTheme: const IconThemeData(
+                        color: AppColors.muted,
+                      ),
                       labelType: NavigationRailLabelType.all,
                       groupAlignment: -0.72,
                       destinations: [

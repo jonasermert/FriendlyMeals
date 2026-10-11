@@ -40,7 +40,10 @@ class PageHeading extends StatelessWidget {
                 Text(title, style: Theme.of(context).textTheme.headlineLarge),
                 if (description != null) ...[
                   const SizedBox(height: AppSpacing.md),
-                  Text(description!, style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    description!,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ],
               ],
             ),
