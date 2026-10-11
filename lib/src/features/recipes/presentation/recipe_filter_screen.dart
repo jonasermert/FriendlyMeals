@@ -145,21 +145,24 @@ class _RecipeFilterScreenState extends ConsumerState<RecipeFilterScreen> {
                           hint: 'z. B. Arrabbiata-Sauce',
                         ),
                         const SizedBox(height: AppSpacing.xl),
-                        SwitchListTile.adaptive(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.lg,
-                          ),
-                          tileColor: const Color(0xFFF9FAFB),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                          ),
-                          title: const Text(
-                            'Nur meine Rezepte',
-                            style: TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          value: _filters.mine,
-                          onChanged: (value) => setState(
-                            () => _filters = _filters.copyWith(mine: value),
+                        Material(
+                          type: MaterialType.transparency,
+                          child: SwitchListTile.adaptive(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                            ),
+                            tileColor: const Color(0xFFF9FAFB),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.md),
+                            ),
+                            title: const Text(
+                              'Nur meine Rezepte',
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                            value: _filters.mine,
+                            onChanged: (value) => setState(
+                              () => _filters = _filters.copyWith(mine: value),
+                            ),
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xl),
