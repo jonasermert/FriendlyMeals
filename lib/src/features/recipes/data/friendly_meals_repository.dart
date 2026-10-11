@@ -14,15 +14,15 @@ class FriendlyMealsRepository {
   Future<FriendlyMealsState> load() async {
     final preferences = await SharedPreferences.getInstance();
     final recipes = _readOrDefault(
-      () => _decodeList(preferences.getString(_recipesKey))
-          .map(Recipe.fromJson)
-          .toList(),
+      () => _decodeList(
+        preferences.getString(_recipesKey),
+      ).map(Recipe.fromJson).toList(),
       <Recipe>[],
     );
     final groceries = _readOrDefault(
-      () => _decodeList(preferences.getString(_groceriesKey))
-          .map(GroceryItem.fromJson)
-          .toList(),
+      () => _decodeList(
+        preferences.getString(_groceriesKey),
+      ).map(GroceryItem.fromJson).toList(),
       <GroceryItem>[],
     );
     final filters = _readOrDefault(() {
@@ -72,9 +72,7 @@ class FriendlyMealsRepository {
     return (jsonDecode(value) as List<Object?>)
         .whereType<Map<Object?, Object?>>()
         .map(
-          (item) => item.map(
-            (key, value) => MapEntry(key.toString(), value),
-          ),
+          (item) => item.map((key, value) => MapEntry(key.toString(), value)),
         )
         .toList();
   }
